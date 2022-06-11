@@ -197,7 +197,10 @@ pub struct EtherClient {
 }
 
 async fn client() -> Result<EtherClient, String> {
-    let transport = web3::transports::Http::new("http://localhost:65000").unwrap();
+    let rpc_endpoint = std::env::var("ETH_RPC_ENDPOINT")
+        .map_err(|e| format!("{}", e));
+    let rpc_endpoint = rpc_endpoint.unwrap_or_else(|_| "http://localhost:8545".to_string());
+    let transport = web3::transports::Http::new(&rpc_endpoint).unwrap();
     let web3 = web3::Web3::new(transport.clone());
     let ens = web3::contract::ens::Ens::new(transport.clone());
 
