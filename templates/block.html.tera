@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include 'head' %}
+    </head>
+    
+    <body>
+        <h1 onclick="location.href='/'">Etherglass</h1>
+        <h3>Block #{{block.number}}</h3>
+        <table>
+            <tr>
+                <td>Number</td>
+                <td>{{block.number}}</td>
+            </tr>
+            <tr>
+                <td>Hash</td>
+                <td>{{block.hash}}</td>
+            </tr>
+            <tr>
+                <td>Parent Hash</td>
+                <td><a href="/block_hash/{{block.parentHash}}">{{block.parentHash}}</a></td>
+            </tr>
+            <tr>
+                <td>Nonce</td>
+                <td>{{block.nonce}}</td>
+            </tr>
+            <tr>
+                <td>Sha3 Uncles</td>
+                <td>{{block.sha3Uncles}}</td>
+            </tr>
+            <tr>
+                <td>Transactions Root</td>
+                <td>{{block.transactionsRoot}}</td>
+            </tr>
+            <tr>
+                <td>State Root</td>
+                <td>{{block.stateRoot}}</td>
+            </tr>
+            <tr>
+                <td>Miner</td>
+                <td>{{block.miner}}</td>
+            </tr>
+            <tr>
+                <td>Difficulty</td>
+                <td>{{block.difficulty}}</td>
+            </tr>
+            <tr>
+                <td>Total Difficulty</td>
+                <td>{{block.totalDifficulty}}</td>
+            </tr>
+            <tr>
+                <td>Extra Data</td>
+                <td>{{block.extraData}}</td>
+            </tr>
+            <tr>
+                <td>Size</td>
+                <td>{{block.size}}</td>
+            </tr>
+            <tr>
+                <td>Gas Limit</td>
+                <td>{{block.gasLimit}}</td>
+            </tr>
+            <tr>
+                <td>Gas Used</td>
+                <td>{{block.gasUsed}}</td>
+            </tr>
+            <tr>
+                <td>Timestamp</td>
+                <td>{{block.timestamp}}</td>
+            </tr>
+            <tr>
+                <td>Uncles</td>
+                <td>{{block.uncles}}</td>
+            </tr>
+        </table>
+        <h1>Transactions</h1>
+        <table>
+            {% for transaction in block.transactions %}
+
+                <tr>
+                    <td><a href="/transaction/{{transaction.hash}}">{{transaction.hash|truncate(length=20)}}</a></td>
+                    <td><a href="/address/{{transaction.from}}">{{transaction.from}}</a></td>
+                    <td><a href="/address/{{transaction.to}}">{{transaction.to}}</a></td>
+                    <td style="text-align:right" id="value{{transaction.hash}}"></td>
+                    <script>
+                        var v = {{transaction.value }} / 1000000000000000000;
+                        if(v>0){
+                            v = v.toFixed(4)
+                        }else{
+                            v = 0 ;
+                        }
+                        document.getElementById("value{{transaction.hash}}").innerHTML = v + " ETH";
+                    </script>
+                </tr>
+                
+            {% endfor %}
+        </table>
+        
+    </body>
+</html>

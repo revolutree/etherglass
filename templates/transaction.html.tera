@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include 'head' %}
+    </head>
+    
+    <body>
+        <h1 onclick="location.href='/'">Etherglass</h1>
+        <h3>Transaction {{transaction.hash}}</h3>
+        <table>
+            <tr>
+                <td>From</td>
+                <td><a href="/address/{{transaction.from}}">{{transaction.from}}</a></td>
+            </tr>
+            <tr>
+                <td>To</td>
+                <td><a href="/address/{{transaction.to}}">{{transaction.to}}</a></td>
+            </tr>
+            <tr>
+                <td>Value</td>
+                <td id="value"></td>
+                <script>
+                    var v = {{transaction.value }} / 1000000000000000000;
+                    document.getElementById("value").innerHTML = v + " ETH";
+                </script>
+            </tr>
+            <tr>
+                <td>Block hash</td>
+                <td><a href="/block_hash/{{transaction.blockHash}}">{{transaction.blockHash}}</a></td>
+            </tr>
+            <tr>
+                <td>Block number</td>
+                <td>{{transaction.blockNumber}}</td>
+            </tr>  
+            <tr>
+                <td>Gas</td>
+                <td>{{transaction.gas}}</td>
+            </tr>
+            <tr>
+                <td>Gas price</td>
+                <td>{{transaction.gasPrice}}</td>
+            </tr>
+            <tr>
+                <td>Nonce</td>
+                <td>{{transaction.nonce}}</td>
+            </tr>
+            <tr>
+                <td>Transaction index</td>
+                <td>{{transaction.transactionIndex}}</td>
+            </tr>
+            <tr>
+                <td>Transaction type</td>
+                <td>{{transaction.type}}</td>
+            </tr>
+            
+            <tr>
+                <td>R</td>
+                <td>{{transaction.r}}</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>{{transaction.s}}</td>
+            </tr>
+            <tr>
+                <td>V</td>
+                <td>{{transaction.v}}</td>
+            </tr>
+            
+            <tr>
+                <td>Input</td>
+                <td>{{transaction.input}}</td>
+            </tr>
+
+        </table>
+        
+        
+    </body>
+</html>

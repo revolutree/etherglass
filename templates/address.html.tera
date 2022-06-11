@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include 'head' %}
+    </head>
+
+    <body>
+        <h1 onclick="location.href='/'">Etherglass</h1>
+        <h3>Address {{address.address}}</h3>
+        <table>
+            
+            <tr>
+                <td>Balance</td>
+                <td id="balance"></td>
+                <script>
+                    var v = {{address.balance }} / 1000000000000000000;
+                    document.getElementById("balance").innerHTML = v + " ETH";
+                </script>
+            </tr>
+            
+        </table>
+        
+        
+    </body>
+</html>

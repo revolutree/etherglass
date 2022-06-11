@@ -1,0 +1,9 @@
+<style>
+* {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+table td, table th{
+    text-align: left;
+}
+</style>

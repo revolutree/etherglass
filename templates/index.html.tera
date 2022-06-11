@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include 'head' %}
+    </head>
+    <body>
+        {% include 'search' %}
+        {% include 'login' %}
+        <h1 onclick="location.href='/'">Etherglass</h1>
+        <h3>Latest blocks:</h3>
+        <table id="blocks_table">
+            <tr>
+                <th>Block number</th>
+                <th>Block hash</th>
+                <th>Tx amount</th> 
+                <th>Timestamp</th>
+            </tr>
+            {% for block in blocks %}
+                <tr>
+                    <td>{{ block.number }}</td>
+                    <td><a href="/block/{{ block.number }}">{{block.hash}}</a></td>
+                    <td>{{ block.tx_amount }}</td>
+                    <td>{{ block.human_date | date(format="%Y-%m-%d %H:%M:%S") }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <script>
+            
+            var blocks_table = document.getElementById("blocks_table");
+            const evtSource = new EventSource("/latest_blocks", { withCredentials: true } );
+            evtSource.onmessage = function(event) {
+                var latest_blocks = JSON.parse(event.data);
+                console.log(latest_blocks);
+
+                // rewrite the full table
+                blocks_table.innerHTML = "";
+                var header = document.createElement("tr");
+                header.innerHTML = "<th>Block number</th><th>Block hash</th><th>Tx amount</th><th>Timestamp</th>";
+                blocks_table.appendChild(header);
+                let blocks = latest_blocks.blocks;
+                for (var i = 0; i < blocks.length; i++) {
+                    var block = blocks[i];
+                    var row = document.createElement("tr");
+                    
+                    let unix_timestamp = block.human_date;
+                    var display_date = new Date(unix_timestamp * 1000);
+
+                    // date to format %Y-%m-%d %H:%M
+                    var date_string = display_date.toISOString().substr(0, 19).replace('T', ' ');
+
+                    row.innerHTML = "<td>" + block.number + "</td><td><a href='/block/" + block.number + "'>" + block.hash + "</a></td><td>" + block.tx_amount + "</td><td>" + date_string + "</td>";
+                    blocks_table.appendChild(row);
+                }
+            }
+        </script>
+    </body>
+</html>

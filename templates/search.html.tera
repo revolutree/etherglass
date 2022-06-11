@@ -1,0 +1,25 @@
+<div id="searchbar">
+<input type="text" placeholder="Search for a tx, address or block number" id="search"><button onclick="search()">Search</button>
+</div>
+<script>
+    function search() {
+        var search_value = document.getElementById("search").value;
+        
+        if(search_value.indexOf(".eth") > 0 || (search_value.indexOf("0x") == 0 && search_value.length == 42) || search_value.length == 40) {
+            location.href = "/address/" + search_value;
+            return false;
+        }
+        if(search_value.indexOf("0x") == 0 && search_value.length == 66) {
+            location.href = "/transaction/" + search_value;
+            return false;
+        }
+        try{
+            parseInt(search_value);
+            location.href = "/block/" + search_value;
+            return false;
+        } catch(e) {
+            location.href = "/block_hash/" + search_value;
+            return false;
+        }
+    }
+</script>
