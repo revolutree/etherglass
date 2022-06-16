@@ -11,10 +11,10 @@ use std::i64;
 use web3::api::Namespace;
 
 // pub mod login (TODO);
+pub mod crawler;
 pub mod pages;
 pub mod parser;
 pub mod rcache;
-pub mod crawler;
 
 #[derive(Deserialize)]
 #[serde(crate = "rocket::serde")]
@@ -125,14 +125,13 @@ lazy_static! {
     static ref REDIS_CACHE: Mutex<bool> = Mutex::new(false);
 }
 
-const POLLING_INTERVAL : u64 = 10;
+const POLLING_INTERVAL: u64 = 10;
 
 /// Receive a message from a form submission and broadcast it to any receivers.
 /// Activate the SSE events
 /// Retrieve the latest X blocks from the node and send them as SSE events
 #[get("/start_polling")]
 async fn start_polling(queue: &State<Sender<BlockEvent>>) -> Json<StatusResponse> {
-
     // Poll for new incoming blocks
     // Check if it's already polling in global Lazy static
     let is_polling_events = IS_POLLING_EVENTS.read().unwrap().to_owned();
@@ -144,7 +143,8 @@ async fn start_polling(queue: &State<Sender<BlockEvent>>) -> Json<StatusResponse
             let mut new_settings = IS_POLLING_EVENTS.write().unwrap();
             *new_settings = true;
         });
-        loop { // Retrieve latest X blocks
+        loop {
+            // Retrieve latest X blocks
             let block_number = &parser::parse_request(
                 "eth",
                 "blockNumber",
@@ -167,7 +167,7 @@ async fn start_polling(queue: &State<Sender<BlockEvent>>) -> Json<StatusResponse
             // Get cache status
             let redis_cache = crate::Cache {
                 enabled: *crate::REDIS_CACHE.lock().unwrap(),
-        
+
                 // Temporary redefining it here, should be moved around coming from the Rocket handler
                 redis_client: Some(redis::Client::open("redis://localhost:6379").unwrap()),
             };
@@ -213,7 +213,6 @@ struct Args {
 fn rocket() -> _ {
     let args = Args::parse();
 
-    
     println!("Enable cache: {}!", args.cache);
     let enable_cache = args.cache;
 
@@ -247,7 +246,7 @@ fn rocket() -> _ {
                     return;
                 }
                 async_std::task::block_on(async move {
-                    crawler::crawler(starting_block,ending_block).await;
+                    crawler::crawler(starting_block, ending_block).await;
                 });
             });
         }
@@ -260,7 +259,7 @@ fn rocket() -> _ {
         enabled: redis_cache,
         redis_client: redis_client,
     };
-    
+
     // Create a channel to send messages to the SSE clients
     let queue = channel::<BlockEvent>(1024).0;
 

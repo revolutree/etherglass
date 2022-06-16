@@ -1,4 +1,4 @@
-use crate::{ parser, RequestData};
+use crate::{parser, RequestData};
 use rocket::serde::Serialize;
 use rocket_dyn_templates::{context, Template};
 

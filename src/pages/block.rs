@@ -1,4 +1,4 @@
-use crate::{ parser, RequestData};
+use crate::{parser, RequestData};
 use rocket::serde::{Deserialize, Serialize};
 use rocket_dyn_templates::{context, Template};
 
@@ -52,12 +52,11 @@ pub async fn block(
     if redis_cache.enabled {
         existing_cache = crate::rcache::check_cache(
             redis_cache.redis_client.clone().unwrap(),
-            &format!("blocktx_{}", b_h)
-        ).unwrap();
+            &format!("blocktx_{}", b_h),
+        )
+        .unwrap();
     }
-    if with_tx.is_some()
-        || existing_cache
-    {
+    if with_tx.is_some() || existing_cache {
         transactions =
             retrieve_transactions(result["transactions"].clone(), redis_cache, b_h).await;
     } else {

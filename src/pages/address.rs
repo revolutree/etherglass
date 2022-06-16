@@ -50,7 +50,6 @@ pub async fn get_balance(address: &str) -> String {
 /// It is also used in the crawler to retrieve the transactions of a block.
 /// note: could be much better implemented.
 pub async fn cache_addresses_transactions_from_block(block_number: i64) {
-    
     // This whole cache should be coming from the Rocket handler, not here.
     let redis_cache = crate::Cache {
         enabled: *crate::REDIS_CACHE.lock().unwrap(),
