@@ -94,6 +94,7 @@
                 </tr>
                 
             {% endfor %}
+            <button onclick="location.href = location.href + '?with_tx'">Load TXs</button>
         </table>
         
     </body>

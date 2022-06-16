@@ -26,6 +26,10 @@
         </table>
         <script>
             
+            // call api GET /start_polling
+
+            fetch('/start_polling');
+            
             var blocks_table = document.getElementById("blocks_table");
             const evtSource = new EventSource("/latest_blocks", { withCredentials: true } );
             evtSource.onmessage = function(event) {

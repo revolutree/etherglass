@@ -10,6 +10,14 @@ pub struct ResponseData {
 pub async fn parse_request(api: &str, method: &str, data: crate::RequestData) -> ResponseData {
     let client = crate::client().await.unwrap();
 
+    // This whole cache should be coming from the Rocket handler, not here.
+    let redis_cache = crate::Cache {
+        enabled: *crate::REDIS_CACHE.lock().unwrap(),
+
+        // Temporary redefining it here, should be moved around coming from the Rocket handler
+        redis_client: Some(redis::Client::open("redis://localhost:6379").unwrap()),
+    };
+
     let result = match api {
         "eth" => match method {
             "balance" => {
@@ -44,12 +52,38 @@ pub async fn parse_request(api: &str, method: &str, data: crate::RequestData) ->
                     .unwrap();
                 let web3_block_number = web3::types::BlockNumber::from(*block_number as i64);
 
+                if redis_cache.enabled {
+                    if crate::rcache::check_cache(
+                        redis_cache.redis_client.clone().unwrap(),
+                        &block_number.to_string(),
+                    )
+                    .unwrap()
+                    {
+                        let cached_block = crate::rcache::get(
+                            redis_cache.redis_client.clone().unwrap(),
+                            &format!("block_{}", block_number),
+                        )
+                        .unwrap();
+                        return ResponseData {
+                            data: serde_json::from_str(&cached_block).unwrap(),
+                        };
+                    };
+                }
+
                 let block = client
                     .web3
                     .eth()
                     .block(web3::types::BlockId::from(web3_block_number))
                     .await
                     .unwrap();
+
+                if redis_cache.enabled {
+                    let _ = crate::rcache::set(
+                        redis_cache.redis_client.clone().unwrap(),
+                        &format!("block_{}", block_number),
+                        &serde_json::to_string(&block).unwrap(),
+                    );
+                }
                 ResponseData {
                     data: serde_json::json!({ "block": block }),
                 }
@@ -58,12 +92,40 @@ pub async fn parse_request(api: &str, method: &str, data: crate::RequestData) ->
                 let block_hash = &crate::clean(data.data["blockHash"].clone().to_string())
                     .parse::<web3::types::H256>()
                     .unwrap();
+
+                if redis_cache.enabled {
+                    if crate::rcache::check_cache(
+                        redis_cache.redis_client.clone().unwrap(),
+                        &block_hash.to_string(),
+                    )
+                    .unwrap()
+                    {
+                        let cached_block = crate::rcache::get(
+                            redis_cache.redis_client.clone().unwrap(),
+                            &format!("block_{}", block_hash.to_string()),
+                        )
+                        .unwrap();
+                        return ResponseData {
+                            data: serde_json::from_str(&cached_block).unwrap(),
+                        };
+                    };
+                }
+
                 let block = client
                     .web3
                     .eth()
                     .block(web3::types::BlockId::Hash(*block_hash))
                     .await
                     .unwrap();
+
+                if redis_cache.enabled {
+                    let _ = crate::rcache::set(
+                        redis_cache.redis_client.clone().unwrap(),
+                        &format!("block_{}", block_hash.to_string()),
+                        &serde_json::to_string(&block).unwrap(),
+                    );
+                }
+
                 ResponseData {
                     data: serde_json::json!({ "block": block }),
                 }
@@ -111,7 +173,7 @@ pub fn response_to_human_readable(res: ResponseData) -> ResponseData {
     let mut data = r.data;
     let data_iter = data.clone();
 
-    for (key, value) in data_iter.as_object().unwrap() {
+    for (key, _value) in data_iter.as_object().unwrap() {
         let strkey = key.as_str();
         match strkey {
             "block" => {

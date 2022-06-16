@@ -1,4 +1,4 @@
-<button onclick="sign()">Sign in with Ethereum</button>
+<button style="display:none" onclick="sign()">Sign in with Ethereum</button>
 <script>
     function sign(){
         // sign with metamask

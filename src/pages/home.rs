@@ -1,5 +1,5 @@
 use crate::{json_value_hex_to_int, parser, RequestData};
-use rocket::serde::{Serialize, Deserialize};
+use rocket::serde::{Deserialize, Serialize};
 use rocket_dyn_templates::{context, Template};
 
 #[derive(Debug, Clone, FromForm, Serialize, Deserialize)]
@@ -27,9 +27,8 @@ pub async fn index() -> Template {
     .data["blockNumber"];
     let b_n = json_value_hex_to_int(block_number.clone());
 
-    
     let latest_blocks: Vec<SimpleBlock> = get_latest_blocks(b_n).await;
-    
+
     Template::render("index", context! { blocks: latest_blocks })
 }
 
@@ -58,5 +57,5 @@ pub async fn get_latest_blocks(b_n: i128) -> Vec<SimpleBlock> {
             human_date: block_timestamp as i64,
         });
     }
-    return latest_blocks
+    return latest_blocks;
 }
