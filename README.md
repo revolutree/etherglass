@@ -2,6 +2,7 @@
 
 Side-car explorer for JSON-RPC enabled Ethereum nodes
 - no DB / on the fly rpc calls
+- Optional redis cache to cache addresses, blocks, transactions for faster response time
 - ENS support
 - Search bar for blocks, addresses, transactions
 
